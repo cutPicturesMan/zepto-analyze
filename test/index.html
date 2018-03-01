@@ -1,168 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-  <script src="../build/zepto.js"></script>
-  <style>
-    .list{
-      width: 200px;
-      height: 50px;
-      border:1px solid #ccc;
-      position: relative;
-    }
-    .item{
-      white-space: nowrap;
-      position: absolute;
-      right: 0;
-      transform: translateX(100%);
-    }
-
-    .list .item{
-      top:0;
-    }
-
-    .list1 .item{
-      top:50%;
-    }
-    /*.item:nth-child(2n){*/
-      /*top: 50%;*/
-    /*}*/
-  </style>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../build/zepto.js"></script>
+    <script src="../build/deferred.js"></script>
+    <script src="../build/callback.js"></script>
 </head>
 <body>
-  <div class="list list1">
-    <div class="item item1">1模块展示顺序按照ppms配置顺序展示</div>
-    <div class="item item2">2展示正在进行的活动</div>
-    <div class="item item3">3未设置model参数时，自动置顶到feed列表</div>
-    <div class="item item4">4置顶模块，可选值</div>
-    <div class="item item5">5销与运营工具开发组  促销与运营工具开发组  活动产品开发组</div>
-  </div>
-  <div class="list list2">
-    <div class="item item1">1模块展示顺序按照ppms配置顺序展示</div>
-    <div class="item item2">2展示正在进行的活动</div>
-    <div class="item item3">3未设置model参数时，自动置顶到feed列表</div>
-    <div class="item item4">4置顶模块，可选值</div>
-    <div class="item item5">5销与运营工具开发组  促销与运营工具开发组  活动产品开发组</div>
-  </div>
-  <script>
-    function Mequeen(target, item){
-      var container = $(target);
+<script>
+//    let Zepto = {};
+//    let $ = Zepto;
+//
+//    ;(function($){
+//        $ = {
+//            args: [],
+//            Deferred(){
+//                var self = this,
+//                    promise = {
+//                        // 初始状态
+//                        state: "waiting",
+//                        // promise标识
+//                        p: "promise",
+//                        // 参数
+//                        arg: undefined
+//                    }
+//
+//                return {
+//                    resolve(arg){
+//                        promise.arg = arg
+//                        promise.state = "resolve"
+//                        self.judge()
+//                    },
+//                    reject(arg){
+//                        promise.arg = arg
+//                        promise.state = "reject"
+//                        self.judge()
+//                    },
+//                    promise(){
+//                        return promise
+//                    }
+//                }
+//            },
+//            when(){
+//                this.args = arguments ? Array.prototype.slice.call(arguments) : []
+//                return this
+//            },
+//            judge(){
+//                var self = this,
+//                    args = this.args,
+//                    resolveArr = [],
+//                    rejectArr = [],
+//                    waitingArr = []
+//
+//                args.forEach((item, index)=>{
+//                    if(item.state == "resolve"){
+//                    resolveArr.push(item.arg)
+//                } else if(item.state == "reject") {
+//                    rejectArr.push(item.arg)
+//                } else if(item.state == "waiting") {
+//                    waitingArr.push(item.arg)
+//                }
+//            })
+//
+//                if(waitingArr.length > 0){
+//                    return false
+//                }
+//
+//                if (resolveArr.length == args.length){
+//                    self.resolve.apply(undefined, resolveArr)
+//                } else {
+//                    self.reject.apply(undefined, rejectArr)
+//                }
+//            },
+//            then(resolve, reject){
+//                this.resolve = resolve
+//                this.reject = reject
+//
+//                this.judge()
+//            }
+//        }
+//    })(Zepto)
 
-      var items = container.find(item);
-      var statement = [];
+    function fn1(){
+        var deferred = $.Deferred()
 
-      // 初始化所有元素的移动状态
-      items.forEach(function(item){
-        // 元素宽度 + 10~50像素的间隔（方便与下一个元素隔开距离）
-        var w = $(item).width() + Math.random(0, 1) * 40 + 10;
-        w = parseFloat(w.toFixed(2));
+        console.log(deferred);
 
-        statement.push({
-          // 元素本身
-          el: $(item),
-          w: w,
-          // x轴上移动的距离
-          x: 0
-        })
-      });
+        setTimeout(()=>{
+            deferred.resolve(1)
+        }, 1000)
 
-      // 所有的元素状态列表
-      this.statement = statement;
-      // 需要移动的列表
-      this.moveList = [Object.assign({}, statement[0])];
-      this.container = container;
-      this.c_w = this.container.width();
-      // 即将添加到移动列表中的序号
-      this.idx = 0;
-      this.distance = parseFloat((Math.random(0, 1) / 3 + 1).toFixed(2));
+        return deferred.promise()
     }
 
-    Mequeen.prototype.init = function(){
+    function fn2(){
+        var deferred = $.Deferred()
 
+        setTimeout(()=>{
+            deferred.resolve(2)
+        }, 2000)
+
+        return deferred.promise()
     }
 
-    Mequeen.prototype.move = function(){
-      var container = this.container,
-        c_w = this.c_w,
-        items = this.items,
-        distance = this.distance,
-        statement = this.statement,
-        moveList = this.moveList,
-        first = moveList[0],
-        // 需要移动的最后一个元素
-        last = moveList[moveList.length - 1],
-        // 待移除的元素序号
-        removeList = [],
-        // 新的待移动列表（剔除了已经移动完毕的元素）
-        newMoveList = [];
+    let p1 = fn1();
+    let p2 = fn2();
 
-      // 如果待移动列表中最后一个元素在x轴上偏移的距离大于本身的宽度，表示该元素已经完全显示出来了，需要加入下一个元素
-      if(last.x > last.w){
-        this.idx++;
+    console.log(p1, p2);
 
-        // 如果本元素已经是最后一个元素了，则取第一个元素加入
-        if(this.idx >= statement.length){
-          this.idx = 0;
-        }
-        moveList.push(Object.assign({}, statement[this.idx]));
-      }
-
-      // 循环设置元素在x轴上的偏移值
-      moveList.forEach(function(item, index){
-        // 一次移动的像素
-        item.x += distance;
-
-        item.el.css({
-          transform: 'translateX(' + (item.w - item.x) + 'px)',
-          webkitTransform: 'translateX(' + (item.w - item.x) + 'px)'
-        })
-
-        // 如果该元素已经完全移出了父元素，则需要从待移动列表中移除
-        if(item.x >= item.w + c_w ){
-          removeList.push(index);
-        }
-      });
-
-      // 如果有已经移动完毕的元素，则需要剔除掉这些元素
-      if(removeList.length){
-        // 将移出屏幕的元素从待移动列表中移除
-        moveList.forEach(function(item, index){
-          // 如果元素不在待移除的列表中，则加入到新的待移动列表里
-          if(removeList.indexOf(index) == -1){
-            newMoveList.push(item);
-          } else {
-            // 否则，将位置重置为初始位置
-            item.el.css({
-              transform: 'translateX(100%)',
-              webkitTransform: 'translateX(100%)'
-            })
-          }
-        });
-
-        this.moveList = newMoveList;
-      }
-    }
-
-    Mequeen.prototype.start = function(){
-      var self = this;
-
-      self.init();
-
-      setInterval(function(){
-        self.move();
-      }, 30);
-    }
-
-    $(function(){
-      var m = new Mequeen('.list1', '.item');
-      m.start();
-      var m2 = new Mequeen('.list2', '.item');
-      m2.start();
-//      $('.item').eq(0).css({
-//        transform: 'translateX(' + 10 + 'px)',
-//      })
+    $.when(p1, p2).then((res1, res2)=>{
+        console.log(res1, res2)
+    }, ()=>{
+        console.log(2)
     })
-  </script>
+
+</script>
 </body>
 </html>
