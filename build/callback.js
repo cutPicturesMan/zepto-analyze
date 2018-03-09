@@ -3,6 +3,13 @@
 //     Zepto.js may be freely distributed under the MIT license.
 
 ;(function($){
+    // 创建一个可以被依次执行的回调函数集合，可配置相应行为
+    // 选项：
+    //   - once: 回调函数列表最多执行一次
+    //   - memory: 记录最近一次的上下文和参数
+    //   - stopOnFalse: 停止迭代回调列表
+    //   - unique: 允许最多添加同一回调的一个实例
+
     // Create a collection of callbacks to be fired in a sequence, with configurable behaviour
     // Option flags:
     //   - once: Callbacks fired at most one time.
@@ -12,13 +19,21 @@
     $.Callbacks = function(options) {
         options = $.extend({}, options)
 
-        var memory, // Last fire value (for non-forgettable lists)
+        var memory, // 最后被执行的值（不可遗忘列表中的）Last fire value (for non-forgettable lists)
+            // 回调列表是否已经执行
             fired,  // Flag to know if list was already fired
+            // 回调列表是否正在被执行
             firing, // Flag to know if list is currently firing
+            // 第一个需要执行的回调函数（用内部的add和fireWith函数执行）
             firingStart, // First callback to fire (used internally by add and fireWith)
+            // 执行中的回调函数数量
             firingLength, // End of the loop when firing
+            // 当前执行的回调函数的序号（该序号可被remove函数修改）
             firingIndex, // Index of currently firing callback (modified by remove if needed)
+            // 真正的回调函数列表
             list = [], // Actual callback list
+
+            // 可重复执行的回调函数列表
             stack = !options.once && [], // Stack of fire calls for repeatable lists
             fire = function(data) {
                 memory = options.memory && data
